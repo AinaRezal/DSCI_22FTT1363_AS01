@@ -10,14 +10,10 @@ st.markdown("<h1 style='text-align: center; color: white;'>EARTHQUAKE</h1>", uns
 
 df1 = pd.read_csv('clean_disaster.csv')
 df2 = pd.read_csv('clean_earthquake.csv')
-tab1, tab2, tab3= st.tabs(['Introduction', 'Main Dashboard', 'Second Dashboard'])
+tab1, tab2 = st.tabs(['Main Dashboard', 'Second Dashboard'])
 
-# Introduction
+
 with tab1:
-    st.markdown('Test')
-
-
-with tab2:
     with st.sidebar:
         st.title("MAIN DASHBOARD'S FILTERS")
 
@@ -57,25 +53,18 @@ with tab2:
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-2 : Correlation of Factors and Intensities of Earthquakes</h4>", unsafe_allow_html=True)
 
-        with st.form('First Form'):
-            st.sidebar.subheader('SELECTION OF VARIABLES FOR V-2')
-            x_variable = st.sidebar.selectbox('X Variable', ['cdi',
-                                                            'mmi',
-                                                            'depth',
-                                                            'magnitude'
-                                                            ])
-            y_variable = st.sidebar.selectbox('Y Variable', ['cdi',
-                                                            'mmi',
-                                                            'depth',
-                                                            'magnitude'
-                                                            ])
+        with st.form('First form'):
+            st.caption('SELECTION OF VARIABLES FOR V-2')
+            y_variable = st.slider('Select value', min_value=0, max_value=1000, value=500, step=10)
             click2 = st.form_submit_button('Show Visualization')
             
         if click2:
             fig3 = px.scatter(df2,
-                            x=x_variable,
-                            y=y_variable)
+                              x = 'magnitude',
+                              y = 'depth',
+                              max = y_variable)
             st.plotly_chart(fig3, use_container_width=True)
+        
 
 # 3 - Number of Affected People
     st.markdown("""---""")
@@ -158,8 +147,16 @@ with tab2:
                 fig4 = px.line(df_vis6, x=df_vis6['Year'], y=y_var)
                 st.plotly_chart(fig4, use_container_width=True)
 
+
+
+
+
+
+
+
+
 # Second Dashboard                
-with tab3:
+with tab2:
     with st.sidebar:
         st.markdown("""---""")
         st.markdown("""---""")
