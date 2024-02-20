@@ -14,9 +14,6 @@ tab1, tab2 = st.tabs(['Main Dashboard', 'Second Dashboard'])
 
 
 with tab1:
-    with st.sidebar:
-        st.title("MAIN DASHBOARD'S FILTERS")
-
 # 1 - Map
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-1 : Location of Earthquakes from 2000 until 2023</h4>", unsafe_allow_html=True)
@@ -112,12 +109,12 @@ with tab1:
 # 5 - Number of people, according to years and chosen country for comparison
     st.markdown("""---""")
     with st.container():
-        st.markdown("<h4 style='text-align: center; color: white;'>V-6 : Timeline of Earthquakes Throughout the Years</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: white;'>V-6&7 : Comparison of Each Entity's Earthquake Timeline</h4>", unsafe_allow_html=True)
         col2 = st.columns(2)
         
         with st.form('Fourth Form'):
-            x_var1 = st.selectbox('First Country', df1['Entity'].unique())
-            x_var2 = st.selectbox('Second Country', df1['Entity'].unique())
+            x_var1 = st.selectbox('First Entity', df1['Entity'].unique())
+            x_var2 = st.selectbox('Second Entity', df1['Entity'].unique())
             y_var = st.radio('Variable', ['Number of deaths from earthquakes',
                                                 'Number of people injured from earthquakes',
                                                 'Number of people affected by earthquakes',
@@ -138,27 +135,42 @@ with tab1:
 
 
 
-
-
-
-
 # Second Dashboard                
 with tab2:
     with st.sidebar:
         st.markdown("""---""")
-        st.markdown("""---""")
         st.title("SECOND DASHBOARD'S FILTERS")
+        st.markdown("""---""")
         
     with st.container():
-        col2 = st.columns(2)
+        col3 = st.columns(2)
         
-    # 6 - Grouped Bar Chart
-        fig5 = px.histogram(df2,
+    # 6 - Grouped Bar Chart    
+        with col3[0]:
+            st.markdown("<h4 style='text-align: center; color: white;'>V-8 : Average Magnitude For Each Alert Level</h4>", unsafe_allow_html=True)
+        fig6 = px.histogram(df2,
                       x='tsunami',
                       y='magnitude',
                       histfunc='avg',
                       color='alert',
                       barmode='group')
-        col2[0].plotly_chart(fig5)
+        col3[0].plotly_chart(fig6)
         
-    # 7 - Pie Chart for 
+    # 7 - Pie Chart for each country depening on economic damages or number of affected people
+        with col3[1]:
+            st.markdown("<h4 style='text-align: center; color: white;'>V-9 : Each Country's Damages or Number of Affected People</h4>", unsafe_allow_html=True)
+        
+        with st.sidebar:
+            st.markdown('V-8 : Selection of Variables')
+        entities = st.sidebar.selectbox('Choice of Entity', df1['Entity'].unique())
+        choice = st.sidebar.radio('Select One', ['Total number of people affected by earthquakes per 100,000',
+                                                 'Total economic damages from earthquakes'])
+        
+        colors = ['CadetBlue', 'BurlyWood', 'DarkBlue', 'DarkMagenta', 'DarkRed', 'DarkSlateBlue']
+        df_vis7 = df1[df1['Entity'] == entities]
+        fig7 = px.pie(df_vis7,
+                      values = choice,
+                      names = 'Year',
+                      color = 'Year')
+        fig7.update_traces(marker=dict(colors=colors))
+        col3[1].plotly_chart(fig7)
