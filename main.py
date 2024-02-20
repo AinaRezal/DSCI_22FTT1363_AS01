@@ -60,7 +60,7 @@ with tab1:
             st.plotly_chart(fig3, use_container_width=True)
         
 
-# 3 - Number of Affected People
+# 3&4 - Number of Affected People
     st.markdown("""---""")
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-3&4 : Number of Affected People</h4>", unsafe_allow_html=True)
@@ -87,7 +87,7 @@ with tab1:
             col1[0].plotly_chart(fig1, use_container_width=True)
             col1[1].plotly_chart(fig2, use_container_width=True)
     
-# 4 - Reliability of Instruments
+# 5 - Reliability of Instruments
     st.markdown("""---""")
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-5 : Reliability of Instruments</h4>", unsafe_allow_html=True)
@@ -106,7 +106,7 @@ with tab1:
                 fig3 = px.scatter(df2, x='sig', y=yVar)
                 st.plotly_chart(fig3, use_container_width=True)
                 
-# 5 - Number of people, according to years and chosen country for comparison
+# 6&7 - Number of people, according to years and chosen country for comparison
     st.markdown("""---""")
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-6&7 : Comparison of Each Entity's Earthquake Timeline</h4>", unsafe_allow_html=True)
@@ -138,14 +138,13 @@ with tab1:
 # Second Dashboard                
 with tab2:
     with st.sidebar:
-        st.markdown("""---""")
         st.title("SECOND DASHBOARD'S FILTERS")
         st.markdown("""---""")
         
     with st.container():
         col3 = st.columns(2)
         
-    # 6 - Grouped Bar Chart    
+# 8 - Grouped Bar Chart    
         with col3[0]:
             st.markdown("<h4 style='text-align: center; color: white;'>V-8 : Average Magnitude For Each Alert Level</h4>", unsafe_allow_html=True)
         fig6 = px.histogram(df2,
@@ -156,12 +155,12 @@ with tab2:
                       barmode='group')
         col3[0].plotly_chart(fig6)
         
-    # 7 - Pie Chart for each country depening on economic damages or number of affected people
+# 9 - Pie Chart for each country depending on economic damages or number of affected people
         with col3[1]:
             st.markdown("<h4 style='text-align: center; color: white;'>V-9 : Each Country's Damages or Number of Affected People</h4>", unsafe_allow_html=True)
-        
         with st.sidebar:
             st.markdown('V-8 : Selection of Variables')
+            
         entities = st.sidebar.selectbox('Choice of Entity', df1['Entity'].unique())
         choice = st.sidebar.radio('Select One', ['Total number of people affected by earthquakes per 100,000',
                                                  'Total economic damages from earthquakes'])
@@ -174,3 +173,23 @@ with tab2:
                       color = 'Year')
         fig7.update_traces(marker=dict(colors=colors))
         col3[1].plotly_chart(fig7)
+    
+# 10 - Bar Graph for magtype
+    with st.container():
+        col4 = st.columns(2)
+        
+    with col4[0]:
+        st.markdown("<h4 style='text-align: center; color: white;'>V-10 : Calculation of Magnitude Using Methods</h4>", unsafe_allow_html=True)
+    
+    fig8 = px.bar(df2,
+                  x = 'magType',
+                  color='magType')
+    col4[0].plotly_chart(fig8)
+    
+# 11 - 
+    with col4[1]:
+        st.markdown("<h4 style='text-align: center; color: white;'>V-11 : Test</h4>", unsafe_allow_html=True)
+        
+# 12 -
+    with st.container():
+        st.markdown("<h4 style='text-align: center; color: white;'>V-12 : Tests</h4>", unsafe_allow_html=True)
