@@ -54,15 +54,12 @@ with tab1:
         st.markdown("<h4 style='text-align: center; color: white;'>V-2 : Correlation of Factors and Intensities of Earthquakes</h4>", unsafe_allow_html=True)
 
         with st.form('First form'):
-            st.caption('SELECTION OF VARIABLES FOR V-2')
-            y_variable = st.slider('Select value', min_value=0, max_value=1000, value=500, step=10)
             click2 = st.form_submit_button('Show Visualization')
             
         if click2:
             fig3 = px.scatter(df2,
                               x = 'magnitude',
-                              y = 'depth',
-                              max = y_variable)
+                              y = 'depth')
             st.plotly_chart(fig3, use_container_width=True)
         
 
@@ -73,19 +70,10 @@ with tab1:
         col1 = st.columns(2)
 
         with st.form('Second Form'):
-            with st.sidebar:
-                st.markdown("""---""")
-            st.sidebar.subheader('SELECTION OF VARIABLES FOR V-3 AND V-4')
-            y_var_1 = st.sidebar.radio('Y Variable for Left Visualization', ['Number of deaths from earthquakes',
-                                                                            'Number of people injured from earthquakes',
-                                                                            'Number of people affected by earthquakes',
-                                                                            'Number of people left homeless from earthquakes'
-                                                                            ])
-            y_var_2 = st.sidebar.radio('Y Variable for Right Visualization', ['Number of deaths from earthquakes',
-                                                                            'Number of people injured from earthquakes',
-                                                                            'Number of people affected by earthquakes',
-                                                                            'Number of people left homeless from earthquakes'
-                                                                            ])
+            y_var_1 = st.radio('Y Variable for Left Visualization', ['Number of people injured from earthquakes',
+                                                                     'Number of people affected by earthquakes',
+                                                                     'Number of people left homeless from earthquakes'
+                                                                    ])
             click1 = st.form_submit_button('Show Visualization')
             
         if click1:
@@ -94,10 +82,10 @@ with tab1:
             df_1 = df_1.iloc[:10]
             fig1 = px.bar(df_1, y=y_var_1, color=y_var_1)
             
-            df_2 = pd.DataFrame(df1.groupby(['Entity'])[y_var_2].sum())
-            df_2 = df_2.sort_values([y_var_2], ascending=False)
+            df_2 = pd.DataFrame(df1.groupby(['Entity'])['Number of deaths from earthquakes'].sum())
+            df_2 = df_2.sort_values(['Number of deaths from earthquakes'], ascending=False)
             df_2 = df_2.iloc[:10]
-            fig2 = px.bar(df_2, y=y_var_2, color=y_var_2)
+            fig2 = px.bar(df_2, y='Number of deaths from earthquakes', color='Number of deaths from earthquakes')
             
             col1[0].plotly_chart(fig1, use_container_width=True)
             col1[1].plotly_chart(fig2, use_container_width=True)
@@ -108,34 +96,29 @@ with tab1:
         st.markdown("<h4 style='text-align: center; color: white;'>V-5 : Reliability of Instruments</h4>", unsafe_allow_html=True)
         
         with st.form('Third Form'):
-            with st.sidebar:
-                st.markdown("""---""")
-            st.sidebar.subheader('SELECTION OF VARIABLES FOR V-5')
-            xVar = st.sidebar.selectbox('X Variable', ['gap',
-                                                    'sig',
-                                                    'dmin',
-                                                    'nst'])
-            yVar = st.sidebar.selectbox('Y Variable', ['gap',
-                                                    'sig',
-                                                    'dmin',
-                                                    'nst'])
+            yVar = st.selectbox('Y Variable', [
+                                                'gap',
+                                                'dmin',
+                                                'nst',
+                                                'alert',
+                                                'mmi'
+                                                ])
             button_4 = st.form_submit_button('Show Visualization')
             
             if button_4:
-                fig3 = px.bar(df2, x=xVar, y=yVar)
+                fig3 = px.scatter(df2, x='sig', y=yVar)
                 st.plotly_chart(fig3, use_container_width=True)
                 
 # 5 - Number of people, according to years and chosen country for comparison
     st.markdown("""---""")
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-6 : Timeline of Earthquakes Throughout the Years</h4>", unsafe_allow_html=True)
+        col2 = st.columns(2)
         
         with st.form('Fourth Form'):
-            with st.sidebar:
-                st.markdown("""---""")
-            st.sidebar.subheader('SELECTION OF VARIABLES FOR V-6')
-            x_var = st.sidebar.selectbox('Country', df1['Entity'].unique())
-            y_var = st.sidebar.radio('Variable', ['Number of deaths from earthquakes',
+            x_var1 = st.selectbox('First Country', df1['Entity'].unique())
+            x_var2 = st.selectbox('Second Country', df1['Entity'].unique())
+            y_var = st.radio('Variable', ['Number of deaths from earthquakes',
                                                 'Number of people injured from earthquakes',
                                                 'Number of people affected by earthquakes',
                                                 'Number of people left homeless from earthquakes'
@@ -143,9 +126,13 @@ with tab1:
             button_5 = st.form_submit_button('Show Visualization')
             
             if button_5:
-                df_vis6 = df1[df1['Entity'] == x_var]
-                fig4 = px.line(df_vis6, x=df_vis6['Year'], y=y_var)
-                st.plotly_chart(fig4, use_container_width=True)
+                df_vis6a = df1[df1['Entity'] == x_var1]
+                df_vis6b = df1[df1['Entity'] == x_var2]
+                fig4 = px.line(df_vis6a, x=df_vis6a['Year'], y=y_var)
+                fig5 = px.line(df_vis6b, x=df_vis6b['Year'], y=y_var)
+                
+                col2[0].plotly_chart(fig4, use_container_width=True)
+                col2[1].plotly_chart(fig5, use_container_width=True)
 
 
 
