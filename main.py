@@ -121,37 +121,46 @@ with tab1:
         selected_indication = st.selectbox('Y Variable', ['gap',
                                                             'dmin',
                                                             'nst',
-                                                            'alert',
                                                             'mmi'
                                                             ])
-            
-        fig3 = px.scatter(df2, x='sig', y=selected_indication)
+        
+        fig3 = px.scatter(df2, x='sig',
+                          y=selected_indication, 
+                          color = 'alert',
+                          color_discrete_map={
+                              'unknown' : 'blue',
+                              'green' : 'green',
+                              'yellow' : 'yellow',
+                              'orange' : 'orange',
+                              'red' : 'red'
+                          })
         st.plotly_chart(fig3, use_container_width=True)
                 
 # 6&7 - Number of people, according to years and chosen country for comparison
     st.markdown("""---""")
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-6&7 : Comparison of Each Entity's Earthquake Timeline</h4>", unsafe_allow_html=True)
-        col2 = st.columns(2)
         
-        with st.form('Fourth Form'):
-            x_var1 = st.selectbox('First Entity', df1['Entity'].unique())
-            x_var2 = st.selectbox('Second Entity', df1['Entity'].unique())
-            y_var = st.radio('Variable', ['Number of deaths from earthquakes',
-                                                'Number of people injured from earthquakes',
-                                                'Number of people affected by earthquakes',
-                                                'Number of people left homeless from earthquakes'
-                                                ])
-            button_5 = st.form_submit_button('Show Visualization')
-            
-            if button_5:
-                df_vis6a = df1[df1['Entity'] == x_var1]
-                df_vis6b = df1[df1['Entity'] == x_var2]
-                fig4 = px.line(df_vis6a, x=df_vis6a['Year'], y=y_var)
-                fig5 = px.line(df_vis6b, x=df_vis6b['Year'], y=y_var)
-                
-                col2[0].plotly_chart(fig4, use_container_width=True)
-                col2[1].plotly_chart(fig5, use_container_width=True)
+        x_var1 = st.selectbox('First Entity', df1['Entity'].unique())
+        x_var2 = st.selectbox('Second Entity', df1['Entity'].unique())
+        y_var = st.radio('Variable', ['Number of deaths from earthquakes',
+                                            'Number of people injured from earthquakes',
+                                            'Number of people affected by earthquakes',
+                                            'Number of people left homeless from earthquakes'
+                                            ])
+        
+        df_vis6a = df1[df1['Entity'] == x_var1]
+        df_vis6b = df1[df1['Entity'] == x_var2]
+        fig4 = px.line(df_vis6a, x=df_vis6a['Year'], y=y_var)
+        fig5 = px.line(df_vis6b, x=df_vis6b['Year'], y=y_var)
+        
+        col2 = st.columns(2)
+        with col2[0]:
+            st.markdown("<h5 style='text-align: center; color: white;'>First Entity</h4>", unsafe_allow_html=True)
+            st.plotly_chart(fig4, use_container_width=True)
+        with col2[1]:
+            st.markdown("<h5 style='text-align: center; color: white;'>Second Entity</h4>", unsafe_allow_html=True)
+            st.plotly_chart(fig5, use_container_width=True)
 
 
 
