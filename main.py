@@ -20,7 +20,7 @@ tab1, tab2 = st.tabs(['Main Dashboard', 'Second Dashboard'])
 with tab1:
 # 1 - Map
     with st.container():
-        st.markdown("<h4 style='text-align: center; color: white;'>V-1 : Location of Earthquakes from 2000 until 2023</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: white;'>V-1 : Location of Earthquakes from 2001 until 2023</h4>", unsafe_allow_html=True)
         col = st.columns(2)
 
         # Filters
@@ -79,7 +79,10 @@ with tab1:
     with st.container():
         st.markdown("<h4 style='text-align: center; color: white;'>V-2 : Correlation of Factors and Intensities of Earthquakes</h4>", unsafe_allow_html=True)
 
-        fig1 = px.scatter(df2,
+        mag_slider = st.slider('Magnitude of Earthquake', 6.5, 9.0, 6.5, step=0.1)
+        if mag_slider:
+            df_magnitude = df2[df2['magnitude'] <= mag_slider]
+        fig1 = px.scatter(df_magnitude,
                             x = 'magnitude',
                             y = 'depth',
                             color = 'magnitude')
@@ -143,24 +146,35 @@ with tab1:
         
         x_var1 = st.selectbox('First Entity', df1['Entity'].unique())
         x_var2 = st.selectbox('Second Entity', df1['Entity'].unique())
+        x_var3 = st.selectbox('Third Entity', df1['Entity'].unique())
+        x_var4 = st.selectbox('Fourth Entity', df1['Entity'].unique())
         y_var = st.radio('Variable', ['Number of deaths from earthquakes',
                                             'Number of people injured from earthquakes',
                                             'Number of people affected by earthquakes',
                                             'Number of people left homeless from earthquakes'
                                             ])
         
-        df_vis6a = df1[df1['Entity'] == x_var1]
-        df_vis6b = df1[df1['Entity'] == x_var2]
-        fig4 = px.line(df_vis6a, x=df_vis6a['Year'], y=y_var)
-        fig5 = px.line(df_vis6b, x=df_vis6b['Year'], y=y_var)
+        df_first_entity = df1[df1['Entity']==x_var1]
+        df_second_entity = df1[df1['Entity']==x_var2]
+        df_third_entity = df1[df1['Entity']==x_var3]
+        df_fourth_entity = df1[df1['Entity']==x_var4]
+        combined_df = [df_first_entity, df_second_entity, df_third_entity, df_fourth_entity]
+        result_df = pd.concat(combined_df)
+        fig5 = px.line(result_df,
+                       x='Year',
+                       y=y_var,
+                       color = 'Entity',
+                       color_discrete_map={
+                           x_var1 : 'blue',
+                           x_var2 : 'red',
+                           x_var3 : 'green',
+                           x_var4 : 'yellow'
+                       })
+        st.plotly_chart(fig5, use_container_width=True)
         
-        col2 = st.columns(2)
-        with col2[0]:
-            st.markdown("<h5 style='text-align: center; color: white;'>First Entity</h4>", unsafe_allow_html=True)
-            st.plotly_chart(fig4, use_container_width=True)
-        with col2[1]:
-            st.markdown("<h5 style='text-align: center; color: white;'>Second Entity</h4>", unsafe_allow_html=True)
-            st.plotly_chart(fig5, use_container_width=True)
+
+
+
 
 
 
@@ -171,29 +185,70 @@ with tab2:
     with st.sidebar:
         st.title("SECOND DASHBOARD'S FILTERS")
         st.markdown("""---""")
+        
         with st.expander('V-8 : Selection of Variables'):
-                entities = st.selectbox('Choice of Entity', df1['Entity'].unique())
-                choice = st.radio('Select One', ['Total number of people affected by earthquakes per 100,000',
-                                                        'Total economic damages from earthquakes'])    
+            selected_function = st.radio('Select histogram function', ['Count',
+                                                                       'Sum',
+                                                                       'Average',
+                                                                       'Minimum',
+                                                                       'Maximum'])
+            if selected_function == 'Count':
+                selected_function = 'count'
+            elif selected_function == 'Sum':
+                selected_function = 'sum'
+            elif selected_function == 'Average':
+                selected_function = 'avg'
+            elif selected_function == 'Minimum':
+                selected_function = 'min'
+            elif selected_function == 'Maximum':
+                selected_function = 'max'
+            
+                
+        with st.expander('V-9 : Selection of Variables'):
+            entities = st.selectbox('Choice of Entity', df1['Entity'].unique())
+            choice = st.radio('Select One', ['Total number of people affected by earthquakes per 100,000',
+                                                    'Total economic damages from earthquakes'])
+        
+        with st.expander('V-10 : Magnitude Type'):
+            selected_variable = st.radio('Select Y variable', ['cdi',
+                                                                'mmi',
+                                                                'sig'])
+            
+        with st.expander('V-11 : Selection of Year'):
+            selected_year = st.select_slider('Year', [1960,
+                                                      1970,
+                                                      1980,
+                                                      1990,
+                                                      2000,
+                                                      2010])
+                
+        with st.expander('V-12 : Selection of Tsunami Occurence'):
+            selected_tsunami = st.selectbox('Occurence of Tsunami', ['Tsunami',
+                                                                     'No Tsunami'])
+            if selected_tsunami == 'Tsunami':
+                selected_tsunami = df2[df2['tsunami']==1]
+            elif selected_tsunami == 'No Tsunami':
+                selected_tsunami = df2[df2['tsunami']==0]
+                
 
+# 8 - Grouped Bar Chart                
     with st.container():
         col3 = st.columns(2)   
         
-        
-# 8 - Grouped Bar Chart    
         with col3[0]:
-            st.markdown("<h4 style='text-align: center; color: white;'>V-8 : Average Magnitude For Each Alert Level</h4>", unsafe_allow_html=True)
+            st.markdown("<h4 style='text-align: center; color: white;'>V-8 : Occurence of Tsunami Depending on Magnitude and Alert Level</h4>", unsafe_allow_html=True)
         fig6 = px.histogram(df2,
                       x='tsunami',
                       y='magnitude',
-                      histfunc='avg',
+                      histfunc=selected_function,
                       color='alert',
                       barmode='group')
         col3[0].plotly_chart(fig6)
+
         
 # 9 - Pie Chart for each country depending on economic damages or number of affected people
         with col3[1]:
-            st.markdown("<h4 style='text-align: center; color: white;'>V-9 : Each Country's Damages or Number of Affected People</h4>", unsafe_allow_html=True)
+            st.markdown("<h4 style='text-align: center; color: white;'>V-9 : Each Entity's Damages or Number of Affected People</h4>", unsafe_allow_html=True)
         
         colors = ['CadetBlue', 'BurlyWood', 'DarkBlue', 'DarkMagenta', 'DarkRed', 'DarkSlateBlue']
         df_vis7 = df1[df1['Entity'] == entities]
@@ -203,23 +258,63 @@ with tab2:
                       color = 'Year')
         fig7.update_traces(marker=dict(colors=colors))
         col3[1].plotly_chart(fig7)
+
     
 # 10 - Bar Graph for magtype
     with st.container():
         col4 = st.columns(2)
         
-    with col4[0]:
-        st.markdown("<h4 style='text-align: center; color: white;'>V-10 : Calculation of Magnitude Using Methods</h4>", unsafe_allow_html=True)
+        with col4[0]:
+            st.markdown("<h4 style='text-align: center; color: white;'>V-10 : Total Number of Earthquakes According to Timeline</h4>", unsafe_allow_html=True)
     
-    fig8 = px.bar(df2,
-                  x = 'magType',
-                  color='magType')
-    col4[0].plotly_chart(fig8)
+        fig8 = px.bar(df2,
+                    x = 'magType',
+                    y = selected_variable,
+                    color='alert')
+        col4[0].plotly_chart(fig8)
+
     
-# 11 - 
+# 11 - Bubble chart
     with col4[1]:
-        st.markdown("<h4 style='text-align: center; color: white;'>V-11 : Test</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: white;'>V-11 : Injury and Death Rates</h4>", unsafe_allow_html=True)
         
-# 12 -
+        fig9 = px.scatter(df1[df1['Year']==selected_year],
+                          x = 'Death rates from earthquakes',
+                          y = 'Injury rates from earthquakes',
+                          size = 'Total number of people affected by earthquakes per 100,000',
+                          color = 'Entity',
+                          log_x=True,
+                          size_max=50)
+        col4[1].plotly_chart(fig9)
+
+        
+# 12 - Recorded Tsunamis in the World
     with st.container():
-        st.markdown("<h4 style='text-align: center; color: white;'>V-12 : Tests</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: white;'>V-12 : Recorded Tsunamis in the World</h4>", unsafe_allow_html=True)
+    
+    map_view = pdk.ViewState(
+        latitude=8.4,
+        longitude=11.7,
+        zoom=1,
+        pitch=0,
+        height = 500,
+        width = 1350
+    )
+
+    map_layer = pdk.Layer(
+        'ScatterplotLayer',
+        data = selected_tsunami,
+        get_position = ['longitude', 'latitude'],
+        radius = 90,
+        extruded = True,
+        opacity = 0.8,
+        radius_min_pixels = 5,
+        radius_max_pixels = 100,
+        getFillColor = [29, 174, 93]
+    )
+
+    st.pydeck_chart(pdk.Deck(
+        map_style='mapbox://styles/mapbox/dark-v11',
+        initial_view_state=map_view,
+        layers=map_layer
+    ))
